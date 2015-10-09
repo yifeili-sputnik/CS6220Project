@@ -13,7 +13,7 @@ public class JsonParserTest {
 	public static void main(String[] args) throws IOException, IOException {
 		Gson gson = new Gson();
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("test.json"));
+			BufferedReader br = new BufferedReader(new FileReader("data/test.json"));
 			MatchObject mo = gson.fromJson(br, MatchObject.class);
 			Result res = mo.getResult();
 			int matchDuration = res.getDuration() / 60;
