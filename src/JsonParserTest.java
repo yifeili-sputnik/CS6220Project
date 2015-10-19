@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -12,8 +13,10 @@ public class JsonParserTest {
 
 	public static void main(String[] args) throws IOException, IOException {
 		Gson gson = new Gson();
+		File f = new File("data/1852823264.json");
 		try {
-			BufferedReader br = new BufferedReader(new FileReader("data/1852823253.json"));
+			BufferedReader br = new BufferedReader(new FileReader(f));
+
 			MatchObject mo = gson.fromJson(br, MatchObject.class);
 			Result res = mo.getResult();
 			int matchDuration = res.getDuration() / 60;
