@@ -10,13 +10,18 @@ import DataObject.MatchObject;
 import DataObject.Player;
 
 public class Converter {
-	public static void convert(FileWriter fl) {
+	public static void convert() throws IOException {
+		FileWriter fl = new FileWriter("data/Matrix.txt");
 		File dir = new File("data/rawdata/");
 		File[] matches = dir.listFiles();
 		for (File f : matches) {
 			MatchObject mo = jsonToObject(f);
-
+			String line = analyzeMatch(mo);
+			fl.write(line);
+			fl.write(System.getProperty("line.separator"));
 		}
+		fl.close();
+		System.out.println("Data created.");
 	}
 
 	/*
@@ -35,7 +40,7 @@ public class Converter {
 	}
 
 	/*
-	 * 
+	 * generate data in the format we need
 	 */
 	public static String analyzeMatch(MatchObject mo) {
 		StringBuilder sb = new StringBuilder();
@@ -43,6 +48,7 @@ public class Converter {
 		for (int i = 0; i < 221; i++) {
 			instance[i] = 0;
 		}
+
 		/*
 		 * 0-4 radiant players 5-9 dire players
 		 */
@@ -60,19 +66,17 @@ public class Converter {
 		if (mo.getResult().isRadiant_win()) {
 			instance[220] = 1;
 		}
-
 		for (int i = 0; i < 221; i++) {
 			sb.append(instance[i] + " ");
 		}
-
 		return sb.toString();
-
 	}
 
 	public static void main(String[] args) {
-		File f = new File("data/rawdata/1852823245.json");
-		MatchObject mo = jsonToObject(f);
-		String res = analyzeMatch(mo);
-		System.out.println(res);
+		try {
+			Converter.convert();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
