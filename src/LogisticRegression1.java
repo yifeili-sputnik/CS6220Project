@@ -7,99 +7,90 @@ import Util.Constants;
 import Util.Converter;
 
 public class LogisticRegression1 {
-	private static double learning_rate = 0.001;
+	private static double learning_rate = 0.01;
+	private static final int CROSSNUMBER = 5;
 	// minus the label column
 	double[] weights = new double[Constants.Cols - 1];
-	int[][] trainMatrix = null;
-	int[][] testMatrix = null;
+	int[][] matrix = null;
 
-	public void getMatrix(int crossNumber) {
+	public LogisticRegression1() {
 		// Convert json to POJO
 		String matches = "data/rawdata";
 		Converter c = new Converter(matches);
 		List<MatchObject> mObjects = new ArrayList<MatchObject>();
 		mObjects = c.convert();
 
-		// split to train and test sets
-		List<MatchObject> trainObjects = new ArrayList<MatchObject>();
-		List<MatchObject> testObjects = new ArrayList<MatchObject>();
-
-		for (int j = 0; j < mObjects.size(); j++) {
-			MatchObject match = mObjects.get(j);
-			if (j % crossNumber == 1) {
-				testObjects.add(match);
-			} else {
-				trainObjects.add(match);
-			}
-		}
 		// construct the match description matrix
-		int trainMatchNums = trainObjects.size();
-		int testMatchNums = testObjects.size();
+		int matchNums = mObjects.size();
 
-		// train matrix
-		int[][] trainMatrix = new int[trainMatchNums][Constants.Cols];
+		int[][] matrix = new int[matchNums][Constants.Cols];
 		int matchCounter = 0;
-		for (MatchObject m : trainObjects) {
+		for (MatchObject m : mObjects) {
 			// hero id
 			for (Player p : m.getResult().getPlayers()) {
 				int heroID = p.getHero_id();
 				int playerSlot = p.getPlayer_slot();
 				if (playerSlot <= 4) {
-					trainMatrix[matchCounter][heroID - 1] = 1;
+					matrix[matchCounter][heroID - 1] = 1;
 				} else {
-					trainMatrix[matchCounter][heroID - 1 + 112] = 1;
+					matrix[matchCounter][heroID - 1 + 112] = 1;
 				}
 			}
 			// win/loss
 			if (m.getResult().isRadiant_win()) {
-				trainMatrix[matchCounter][Constants.Cols - 1] = 1;
+				matrix[matchCounter][Constants.Cols - 1] = 1;
 			}
-			trainMatrix[matchCounter][Constants.Cols - 2] = 1;
+			// constants
+			matrix[matchCounter][Constants.Cols - 2] = 1;
 			// next match
 			matchCounter++;
 		}
-		this.trainMatrix = trainMatrix;
-		matchCounter = 0;
-
-		// test matrix
-		int[][] testMatrix = new int[testMatchNums][Constants.Cols];
-		for (MatchObject m : testObjects) {
-			// hero id
-			for (Player p : m.getResult().getPlayers()) {
-				int heroID = p.getHero_id();
-				int playerSlot = p.getPlayer_slot();
-				if (playerSlot <= 4) {
-					testMatrix[matchCounter][heroID - 1] = 1;
-				} else {
-					testMatrix[matchCounter][heroID - 1 + 112] = 1;
-				}
-			}
-			// win/loss
-			if (m.getResult().isRadiant_win()) {
-				testMatrix[matchCounter][Constants.Cols - 1] = 1;
-			}
-			testMatrix[matchCounter][Constants.Cols - 2] = 1;
-			// next match
-			matchCounter++;
-		}
-		this.testMatrix = testMatrix;
-
-		// for (int i = 0; i < trainMatrix.length; i++) {
-		// for (int j = 0; j < trainMatrix[0].length; j++) {
-		// System.out.print(trainMatrix[i][j] + " ");
-		// }
-		// System.out.println();
-		// }
-		// System.out.println("-------------");
-		// for (int i = 0; i < testMatrix.length; i++) {
-		// for (int j = 0; j < testMatrix[0].length; j++) {
-		// System.out.print(testMatrix[i][j] + " ");
-		// }
-		// System.out.println();
-		// }
+		this.matrix = matrix;
 	}
 
-	public void train() {
+	public int[][] getTrainMatrix(int crossNum) {
+		int trainMatrixLen = 0;
+		for (int i = 0; i < matrix.length; i++) {
+			if (i % CROSSNUMBER != crossNum) {
+				trainMatrixLen++;
+			}
+		}
+		// System.out.println("Train Matrix: " + trainMatrixLen);
+		int[][] trainMatrix = new int[trainMatrixLen][Constants.Cols];
+		int counter = 0;
+		for (int i = 0; i < matrix.length; i++) {
+			if (i % CROSSNUMBER != crossNum) {
+				for (int j = 0; j < Constants.Cols; j++) {
+					trainMatrix[counter][j] = matrix[i][j];
+				}
+				counter++;
+			}
+		}
+		return trainMatrix;
+	}
+
+	public int[][] getTestMatrix(int crossNum) {
+		int testMatrixLen = 0;
+		for (int i = 0; i < matrix.length; i++) {
+			if (i % CROSSNUMBER == crossNum) {
+				testMatrixLen++;
+			}
+		}
+		// System.out.println("Test Matrix: " + testMatrixLen);
+		int[][] testMatrix = new int[testMatrixLen][Constants.Cols];
+		int counter = 0;
+		for (int i = 0; i < matrix.length; i++) {
+			if (i % CROSSNUMBER == crossNum) {
+				for (int j = 0; j < Constants.Cols; j++) {
+					testMatrix[counter][j] = matrix[i][j];
+				}
+				counter++;
+			}
+		}
+		return testMatrix;
+	}
+
+	public void train(int[][] trainMatrix) {
 		// first derivative
 		double[] firstDerivative = new double[Constants.Cols - 1];
 		double prelkh = 0.0;
@@ -128,15 +119,17 @@ public class LogisticRegression1 {
 				}
 				currlkh += (trainMatrix[i][Constants.Cols - 1] * xb - Math.log(1 + Math.exp(xb)));
 			}
-			 System.out.println(currlkh);
+			// System.out.println(currlkh);
 
-			if (Math.abs(currlkh - prelkh) < 0.01)
+			if (Math.abs(currlkh - prelkh) < 0.1)
 				break;
+
+			prelkh = currlkh;
 		}
-		System.out.println(currlkh);
+		// System.out.println(currlkh);
 	}
 
-	public double test() {
+	public double test(int[][] testMatrix) {
 		double accuracy = 0.0;
 		int counter = 0;
 		int output = -1;
@@ -160,9 +153,16 @@ public class LogisticRegression1 {
 	}
 
 	public static void main(String[] args) {
+		double accuracy = 0;
 		LogisticRegression1 l = new LogisticRegression1();
-		l.getMatrix(5);
-		l.train();
-		System.out.println(l.test());
+		for (int i = 0; i < CROSSNUMBER; i++) {
+			System.out.print("Cross " + (i + 1) + ": ");
+			int[][] trainMatrix = l.getTrainMatrix(i);
+			int[][] testMatrix = l.getTestMatrix(i);
+			l.train(trainMatrix);
+			System.out.println(l.test(testMatrix));
+			accuracy += l.test(testMatrix);
+		}
+		System.out.println("Average accuracy: " + (double) accuracy / CROSSNUMBER);
 	}
 }
