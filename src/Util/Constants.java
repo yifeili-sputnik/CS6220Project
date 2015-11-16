@@ -8,5 +8,8 @@ public class Constants {
 
 	// 112*2+1+1
 	// 112 heros + 112 heros + constant + label
-	public static final int Cols = 226;
+	public static final int Cols1 = 226;
+
+	// 112+1+1
+	public static final int Cols2 = 114;
 }

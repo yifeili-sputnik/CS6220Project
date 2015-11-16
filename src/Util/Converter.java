@@ -78,15 +78,9 @@ public class Converter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (mo.getResult() == null) {
+		if (mo.getResult().getMatch_id() == 0) {
 			filesToBeDeleted.add(file.getAbsolutePath());
 		}
 		return mo;
 	}
-
-	// public static void main(String[] args) {
-	// File f = new File("data/rawdata/1939645009.json");
-	// MatchObject m = Converter.jsonToObject(f);
-	// System.out.println();
-	// }
 }
