@@ -13,12 +13,8 @@ public class LogisticRegression1 {
 	double[] weights = new double[Constants.Cols - 1];
 	int[][] matrix = null;
 
-	public LogisticRegression1() {
+	public LogisticRegression1(List<MatchObject> mObjects) {
 		// Convert json to POJO
-		String matches = "data/rawdata";
-		Converter c = new Converter(matches);
-		List<MatchObject> mObjects = new ArrayList<MatchObject>();
-		mObjects = c.convert();
 
 		// construct the match description matrix
 		int matchNums = mObjects.size();
@@ -153,16 +149,21 @@ public class LogisticRegression1 {
 	}
 
 	public static void main(String[] args) {
-		double accuracy = 0;
-		LogisticRegression1 l = new LogisticRegression1();
-		for (int i = 0; i < CROSSNUMBER; i++) {
-			System.out.print("Cross " + (i + 1) + ": ");
-			int[][] trainMatrix = l.getTrainMatrix(i);
-			int[][] testMatrix = l.getTestMatrix(i);
-			l.train(trainMatrix);
-			System.out.println(l.test(testMatrix));
-			accuracy += l.test(testMatrix);
-		}
-		System.out.println("Average accuracy: " + (double) accuracy / CROSSNUMBER);
+		String matches = "data/rawdata";
+		Converter c = new Converter(matches);
+		List<MatchObject> mObjects = new ArrayList<MatchObject>();
+		mObjects = c.convert();
+		// double accuracy = 0;
+		// LogisticRegression1 l = new LogisticRegression1(mObjects);
+		// for (int i = 0; i < CROSSNUMBER; i++) {
+		// System.out.print("Cross " + (i + 1) + ": ");
+		// int[][] trainMatrix = l.getTrainMatrix(i);
+		// int[][] testMatrix = l.getTestMatrix(i);
+		// l.train(trainMatrix);
+		// System.out.println(l.test(testMatrix));
+		// accuracy += l.test(testMatrix);
+		// }
+		// System.out.println("Average accuracy: " + (double) accuracy /
+		// CROSSNUMBER);
 	}
 }

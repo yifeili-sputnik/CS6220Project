@@ -14,13 +14,14 @@ public class MatchDataCrawler {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		// get match data from match_id-i to match_id
-		int match_id = 1938789531;
+		int match_id = 1939645102;
 		
 		for (int i = 0; i < 2000; i++) {
 			match_id--;
 			sendGET(String.valueOf(match_id));
-			Thread.sleep(new Random().nextInt(1000));
+			Thread.sleep(new Random().nextInt(500));
 		}
+		System.out.println("API call finished.");
 	}
 
 	public static void sendGET(String match_id) throws IOException {

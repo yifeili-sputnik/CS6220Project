@@ -14,6 +14,7 @@ import DataObject.Player;
 
 public class Converter {
 	private String file = null;
+	private List<String> filesToBeDeleted = new ArrayList<String>();
 
 	public Converter(String f) {
 		this.file = f;
@@ -43,18 +44,26 @@ public class Converter {
 				matchCounter++;
 				res.add(mo);
 			} else {
-				// TO-DO
-				// delete useless matches
-				// if (f.delete()) {
-				// System.out.println("deleted!");
-				// } else {
-				// System.out.println("delete failed.");
-				// }
+				filesToBeDeleted.add(f.getAbsolutePath());
 			}
 		}
+		System.out.println("Total matches: " + matches.length);
 		System.out.printf("Successfully converted %d matches", matchCounter);
 		System.out.println();
+		deleteInvalidMatches();
 		return res;
+	}
+
+	public void deleteInvalidMatches() {
+		int counter = 0;
+		for (String str : filesToBeDeleted) {
+			File f = new File(str);
+			if (f.exists() && f.delete()) {
+				counter++;
+			}
+		}
+		System.out.printf("Successfully deleted %d matches", counter);
+		System.out.println();
 	}
 
 	/*
@@ -69,6 +78,15 @@ public class Converter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		if (mo.getResult() == null) {
+			filesToBeDeleted.add(file.getAbsolutePath());
+		}
 		return mo;
 	}
+
+	// public static void main(String[] args) {
+	// File f = new File("data/rawdata/1939645009.json");
+	// MatchObject m = Converter.jsonToObject(f);
+	// System.out.println();
+	// }
 }
