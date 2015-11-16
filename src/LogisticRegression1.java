@@ -152,6 +152,7 @@ public class LogisticRegression1 {
 		Converter c = new Converter(matches);
 		List<MatchObject> mObjects = new ArrayList<MatchObject>();
 		mObjects = c.convert();
+		
 		double accuracy = 0;
 		LogisticRegression1 l = new LogisticRegression1(mObjects);
 		for (int i = 0; i < CROSSNUMBER; i++) {

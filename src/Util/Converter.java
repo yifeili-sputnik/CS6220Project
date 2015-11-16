@@ -3,6 +3,7 @@ package Util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,13 @@ public class Converter {
 		int matchCounter = 0;
 		File dir = new File(file);
 		ArrayList<MatchObject> res = new ArrayList<MatchObject>();
-		File[] matches = dir.listFiles();
+		File[] matches = dir.listFiles(new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+				if (name.charAt(0) == '.')
+					return false;
+				return true;
+			}
+		});
 		for (File f : matches) {
 			MatchObject mo = jsonToObject(f);
 			// check validation of match data
