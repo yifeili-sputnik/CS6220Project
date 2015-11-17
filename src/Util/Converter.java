@@ -85,7 +85,8 @@ public class Converter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (mo.getResult().getMatch_id() == 0) {
+		if (mo.getResult().getMatch_id() == 0 || mo.getResult().getHuman_players() != 10
+				|| (mo.getResult().getGame_mode() != 1 && mo.getResult().getGame_mode() != 22)) {
 			filesToBeDeleted.add(file.getAbsolutePath());
 		}
 		return mo;

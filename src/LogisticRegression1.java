@@ -7,7 +7,7 @@ import Util.Constants;
 import Util.Converter;
 
 public class LogisticRegression1 {
-	private static double learning_rate = 0.01;
+	private static double learning_rate = 0.00001;
 	private static final int CROSSNUMBER = 5;
 	// minus the label column
 	double[] weights = new double[Constants.Cols1 - 1];
@@ -49,7 +49,6 @@ public class LogisticRegression1 {
 				trainMatrixLen++;
 			}
 		}
-		// System.out.println("Train Matrix: " + trainMatrixLen);
 		int[][] trainMatrix = new int[trainMatrixLen][Constants.Cols1];
 		int counter = 0;
 		for (int i = 0; i < matrix.length; i++) {
@@ -70,7 +69,6 @@ public class LogisticRegression1 {
 				testMatrixLen++;
 			}
 		}
-		// System.out.println("Test Matrix: " + testMatrixLen);
 		int[][] testMatrix = new int[testMatrixLen][Constants.Cols1];
 		int counter = 0;
 		for (int i = 0; i < matrix.length; i++) {
@@ -152,7 +150,6 @@ public class LogisticRegression1 {
 		Converter c = new Converter(matches);
 		List<MatchObject> mObjects = new ArrayList<MatchObject>();
 		mObjects = c.convert();
-		
 		double accuracy = 0;
 		LogisticRegression1 l = new LogisticRegression1(mObjects);
 		for (int i = 0; i < CROSSNUMBER; i++) {
