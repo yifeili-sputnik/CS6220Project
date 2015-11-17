@@ -29,7 +29,7 @@ public class KNN {
 			}
 		}
 		// TO-DO design a better distance formula
-		similarity = counter * counter * Math.log(counter / 10);
+		similarity = counter * counter * counter;
 		return similarity;
 	}
 
