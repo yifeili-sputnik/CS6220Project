@@ -14,9 +14,9 @@ public class MatchDataCrawler {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		// get match data from match_id-i to match_id
-		int match_id = 1940586799;
-		
-		for (int i = 0; i < 2000; i++) {
+		int match_id = 1942120639;
+
+		for (int i = 0; i < 3000; i++) {
 			match_id--;
 			sendGET(String.valueOf(match_id));
 			Thread.sleep(new Random().nextInt(500));

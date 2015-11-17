@@ -8,7 +8,7 @@ import Util.Converter;
 
 public class LogisticRegression2 {
 	private static double learning_rate = 0.00001;
-	private static final int CROSSNUMBER = 5;
+	private static final int CROSSNUMBER = 10;
 	// minus the label column
 	double[] weights = new double[Constants.Cols2 - 1];
 	List<MatchObject> matches = new ArrayList<MatchObject>();
@@ -103,7 +103,7 @@ public class LogisticRegression2 {
 
 			prelkh = currlkh;
 		}
-		// System.out.println(currlkh);
+		System.out.println("MLE: " + currlkh);
 	}
 
 	public double test(List<MatchObject> testMatches) {
@@ -153,14 +153,14 @@ public class LogisticRegression2 {
 		double accuracy = 0.0;
 		LogisticRegression2 l = new LogisticRegression2(mObjects);
 		for (int i = 0; i < CROSSNUMBER; i++) {
-			System.out.print("Cross " + (i + 1) + ": ");
+			System.out.println("Cross " + (i + 1) + ": ");
 			List<MatchObject> trainMatches = l.getTrainMatches(i);
 			List<MatchObject> testMatches = l.getTestMatches(i);
 			l.train(trainMatches);
-			System.out.println(l.test(testMatches));
-			accuracy += l.test(testMatches);
+			double tmpAccuracy = l.test(testMatches);
+			System.out.println("Accuracy: " + tmpAccuracy);
+			accuracy += tmpAccuracy;
 		}
 		System.out.println("Average accuracy: " + (double) accuracy / CROSSNUMBER);
-
 	}
 }
