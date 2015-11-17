@@ -17,8 +17,8 @@ public class KNN {
 		this.matches = mObjects;
 	}
 
-	public double getDistance(MatchObject m1, MatchObject m2) {
-		double distance = 0.0;
+	public double getSimilarity(MatchObject m1, MatchObject m2) {
+		double similarity = 0.0;
 		int[] m1Array = objectToArray(m1);
 		int[] m2Array = objectToArray(m2);
 		// counter same heroes in two matches
@@ -28,10 +28,9 @@ public class KNN {
 				counter++;
 			}
 		}
-		double similarity = (double) counter / m1Array.length;
-		// distance formula
-		distance = similarity * similarity * similarity;
-		return distance;
+		// TO-DO design a better distance formula
+		similarity = counter * counter * Math.log(counter / 10);
+		return similarity;
 	}
 
 	// convert match object to heroes array
@@ -58,15 +57,14 @@ public class KNN {
 			HashMap<MatchObject, Double> neighbors = new HashMap<MatchObject, Double>();
 			for (MatchObject trainM : trainMatches) {
 				if (neighbors.size() < NEIGHBORNUMBER) {
-					neighbors.put(trainM, getDistance(trainM, testM));
-					// System.out.println(neighbors.size());
+					neighbors.put(trainM, getSimilarity(trainM, testM));
 				} else {
-					double distance = getDistance(trainM, testM);
+					double distance = getSimilarity(trainM, testM);
 					boolean toAdd = false;
 					Iterator<Entry<MatchObject, Double>> iter = neighbors.entrySet().iterator();
 					while (iter.hasNext()) {
 						Entry<MatchObject, Double> e = iter.next();
-						if (e.getValue() > distance) {
+						if (e.getValue() < distance) {
 							iter.remove();
 							toAdd = true;
 							break;
