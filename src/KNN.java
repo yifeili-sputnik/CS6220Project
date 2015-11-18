@@ -9,9 +9,9 @@ import DataObject.Player;
 import Util.Converter;
 
 public class KNN {
-	private static int NEIGHBORNUMBER = 88;
+	private static int NEIGHBORNUMBER = 100;
 	List<MatchObject> matches = new ArrayList<MatchObject>();
-	private static final int CROSSNUMBER = 10;
+	private static final int CROSSNUMBER = 5;
 
 	public KNN(List<MatchObject> mObjects) {
 		this.matches = mObjects;
@@ -29,7 +29,7 @@ public class KNN {
 			}
 		}
 		// TO-DO design a better distance formula
-		similarity = counter * counter * counter;
+		similarity = Math.pow(counter, 6);
 		return similarity;
 	}
 
