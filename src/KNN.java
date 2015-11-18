@@ -29,7 +29,9 @@ public class KNN {
 			}
 		}
 		// TO-DO design a better distance formula
-		similarity = Math.pow(counter, 6);
+		// similarity = Math.pow(counter, 9);
+		// similarity = Math.pow(Math.log(counter + 1), 2);
+		similarity = Math.exp(counter) - 1;
 		return similarity;
 	}
 
