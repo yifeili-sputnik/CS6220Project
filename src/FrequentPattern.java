@@ -39,7 +39,7 @@ public class FrequentPattern {
 		return winner;
 	}
 	
-	public void Apriori(){
+	public List<List<Integer>> Apriori(){
 		List<List<Integer>> C = new ArrayList<List<Integer>>();
 		List<List<Integer>> L = new ArrayList<List<Integer>>();
 		int cont = 0;
@@ -55,11 +55,50 @@ public class FrequentPattern {
 			if(initSet[i] >= this.minSup){
 				List<Integer>  item = new ArrayList<Integer>();
 				item.add(i);
-				C.add(item);
+				L.add(item);
 			}
 		}
 		while(cont < 2){
+			//find C(k) from L(k-1)
+			//join
+			C = findCandidate(L);
+			//prunning
+			C = pruning(C, L);
+			L = TestCandidate(C);
 			cont++;
 		}
+		return C;
+	}
+	//Helper function for Apriori, join step of finding the C(k) candidates from L(k-1)
+	private List<List<Integer>> findCandidate(List<List<Integer>> L){
+		List<List<Integer>> C = new ArrayList<List<Integer>>();
+		for(int i = 0; i<L.size(); i++){
+			List<Integer> itemset_1 = L.get(i);
+			for(int j = i+1; j<L.size(); j++){
+				List<Integer> itemset_2 = L.get(j);
+				if(compare(itemset_1, itemset_2)
+						&& itemset_1.get(itemset_1.size() - 1) < itemset_2.get(itemset_2.size()-1)){
+					List<Integer> newItemSet = new ArrayList<Integer>(itemset_1);
+					newItemSet.add(itemset_2.get(itemset_2.size()-1));
+					C.add(newItemSet);
+				}
+			}
+		}
+		return C;
+	}
+	//Helper function for findCandidate(), compare first k-2 items in itemset.
+	private boolean compare(List<Integer> A, List<Integer> B){
+		boolean result = true;
+		if(A.size() != B.size()) return false;
+		if(A == null || B == null) return false;
+		for(int i = 0; i < A.size()-1; i++){
+			result = result && (A.get(i) == B.get(i));
+		}
+		return result;
+	}
+	//Helper function for Apriori, pruning step of finding the C(k) candidates from L(k-1)
+	private List<List<Integer>> pruning(List<List<Integer>> C, List<List<Integer>> L){
+		
+		return C;
 	}
 }
