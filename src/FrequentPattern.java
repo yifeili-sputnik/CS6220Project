@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import DataObject.MatchObject;
 import DataObject.Player;
@@ -69,7 +70,7 @@ public class FrequentPattern {
 		}
 		return C;
 	}
-	//Helper function for Apriori, join step of finding the C(k) candidates from L(k-1)
+	//Helper function for Apriori, join step for finding the C(k) candidates from L(k-1)
 	private List<List<Integer>> findCandidate(List<List<Integer>> L){
 		List<List<Integer>> C = new ArrayList<List<Integer>>();
 		for(int i = 0; i<L.size(); i++){
@@ -97,8 +98,23 @@ public class FrequentPattern {
 		return result;
 	}
 	//Helper function for Apriori, pruning step of finding the C(k) candidates from L(k-1)
-	private List<List<Integer>> pruning(List<List<Integer>> C, List<List<Integer>> L){
+	private List<List<Integer>> pruning(List<List<Integer>> c, List<List<Integer>> l){
+		Predicate<List<Integer>> prunSublist = (itemset) -> isNotMember(itemset, l);
+		c.removeIf(prunSublist);
+		return c;
+	}
+	private boolean isNotMember(List<Integer> set, List<List<Integer>> fpItemset){
+		boolean result = true;
+		for(int i = 0; i<set.size(); i++){
+			List<Integer> tempSet = new ArrayList<Integer>(set);
+			result = result && fpItemset.contains(tempSet.remove(i));
+		}
+		return !result;
+	}
+	//Helper function for Apriori, testing step for test C(k) against data;
+	private List<List<Integer>> TestCandidate(List<List<Integer>> candidate_k){
+		List<List<Integer>> fp_k = new ArrayList<List<Integer>>();
 		
-		return C;
+		return fp_k;
 	}
 }
