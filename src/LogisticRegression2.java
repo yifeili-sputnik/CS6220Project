@@ -40,7 +40,7 @@ public class LogisticRegression2 {
 	public void train(List<MatchObject> mObjects) {
 		// construct train matrix
 		int teamNumber = mObjects.size() * 2;
-		FrequentPattern fp = new FrequentPattern(mObjects, (int) (mObjects.size() * 5 / 112 / 2 / 1.5));
+		FrequentPattern fp = new FrequentPattern(mObjects, (int) (mObjects.size() * 5 / 112 / 2 / 2));
 		fp.Apriori();
 
 		int[][] trainMatrix = new int[teamNumber][Constants.Cols2];
