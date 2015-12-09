@@ -12,6 +12,7 @@ public class Constants {
 
 	// 112+1+1
 	public static final int Cols2 = 114;
-	//constant hero number
+	
+	// constant hero number
 	public static final int HERONUM = 112;
 }
