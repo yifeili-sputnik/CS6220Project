@@ -87,6 +87,7 @@ public class LogisticRegression1 {
 		double[] firstDerivative = new double[Constants.Cols1 - 1];
 		double prelkh = 0.0;
 		double currlkh = 0.0;
+		double L1R = 0.0;
 		while (true) {
 			for (int i = 0; i < trainMatrix.length; i++) {
 				double xb = 0;
@@ -102,6 +103,11 @@ public class LogisticRegression1 {
 			for (int j = 0; j < Constants.Cols1 - 1; j++) {
 				weights[j] += learning_rate * firstDerivative[j];
 			}
+
+			// L1 regularization
+			// for (int j = 0; j < Constants.Cols1 - 1; j++) {
+			// L1R += weights[j];
+			// }
 			// likelihood
 			currlkh = 0.0;
 			for (int i = 0; i < trainMatrix.length; i++) {
@@ -111,6 +117,7 @@ public class LogisticRegression1 {
 				}
 				currlkh += (trainMatrix[i][Constants.Cols1 - 1] * xb - Math.log(1 + Math.exp(xb)));
 			}
+			// currlkh += 1.0 / 5 * L1R;
 			// System.out.println(currlkh);
 
 			if (Math.abs(currlkh - prelkh) < 0.1)

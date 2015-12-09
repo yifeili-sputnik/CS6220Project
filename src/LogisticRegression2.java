@@ -130,9 +130,8 @@ public class LogisticRegression2 {
 				radiantXB += radientTeam[j] * weights[j];
 				direXB += direTeam[j] * weights[j];
 			}
-			double radiantWin = Math.exp(radiantXB) / (1 + Math.exp(radiantXB));
-			double direWin = Math.exp(direXB) / (1 + Math.exp(direXB));
-			if (radiantWin - direWin > 0) {
+			double radiantWin = Math.exp(radiantXB - direXB) / (1 + Math.exp(radiantXB - direXB));
+			if (radiantWin > 0.5) {
 				output = true;
 			} else {
 				output = false;
