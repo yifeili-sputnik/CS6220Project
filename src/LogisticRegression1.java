@@ -120,7 +120,7 @@ public class LogisticRegression1 {
 			// currlkh += 1.0 / 5 * L1R;
 			// System.out.println(currlkh);
 
-			if (Math.abs(currlkh - prelkh) < 0.1)
+			if (Math.abs(currlkh - prelkh) / currlkh < 1e-6)
 				break;
 
 			prelkh = currlkh;

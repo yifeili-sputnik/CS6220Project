@@ -40,18 +40,25 @@ public class LogisticRegression2 {
 	public void train(List<MatchObject> mObjects) {
 		// construct train matrix
 		int teamNumber = mObjects.size() * 2;
+		FrequentPattern fp = new FrequentPattern(mObjects, (int) (mObjects.size() * 5 / 112 / 2 / 1.5));
+		fp.Apriori();
 
 		int[][] trainMatrix = new int[teamNumber][Constants.Cols2];
 		int counter = 0;
+
 		for (MatchObject m : mObjects) {
+			List<Integer> radiantTeam = new ArrayList<Integer>();
+			List<Integer> direTeam = new ArrayList<Integer>();
 			// hero id
 			for (Player p : m.getResult().getPlayers()) {
 				int heroID = p.getHero_id();
 				int playerSlot = p.getPlayer_slot();
 				if (playerSlot <= 4) {
 					trainMatrix[counter][heroID - 1] = 1;
+					radiantTeam.add(heroID);
 				} else {
 					trainMatrix[counter + 1][heroID - 1] = 1;
+					direTeam.add(heroID);
 				}
 			}
 			// win/loss
@@ -63,6 +70,28 @@ public class LogisticRegression2 {
 			// constants
 			trainMatrix[counter][Constants.Cols2 - 2] = 1;
 			trainMatrix[counter + 1][Constants.Cols2 - 2] = 1;
+
+			int radiantFPs = 0;
+			int direFPs = 0;
+			// Length 1 frequent pattern
+			// System.out.println("Searching for L1 frequent patterns!" +
+			// PatternSearchCounter);
+			radiantFPs = findLen1Patterns(radiantTeam, fp.Len1Patterns);
+			direFPs = findLen1Patterns(direTeam, fp.Len1Patterns);
+			// System.out.println("Radiant L1 patterns: " + radiantFPs + "; " +
+			// "Dire L1 patterns; " + direFPs);
+			trainMatrix[counter][Constants.Cols2 - 4] = radiantFPs;
+			trainMatrix[counter + 1][Constants.Cols2 - 4] = direFPs;
+
+			// Length 2 frequent pattern
+			// System.out.println("Searching for L2 frequent patterns!" +
+			// PatternSearchCounter);
+			radiantFPs = findLen2Patterns(radiantTeam, fp.Len2Patterns);
+			direFPs = findLen2Patterns(direTeam, fp.Len2Patterns);
+			// System.out.println("Radiant L2 patterns: " + radiantFPs + "; " +
+			// "Dire L2 patterns; " + direFPs);
+			trainMatrix[counter][Constants.Cols2 - 3] = radiantFPs;
+			trainMatrix[counter + 1][Constants.Cols2 - 3] = direFPs;
 
 			// next match
 			counter += 2;
@@ -98,12 +127,35 @@ public class LogisticRegression2 {
 			}
 			// System.out.println(currlkh);
 
-			if (Math.abs(currlkh - prelkh) < 0.1)
+			if (Math.abs(currlkh - prelkh) / currlkh < 1e-6)
 				break;
 
 			prelkh = currlkh;
 		}
 		System.out.println("MLE: " + currlkh);
+	}
+
+	public int findLen1Patterns(List<Integer> team, List<Integer> patterns) {
+		int counter = 0;
+		for (int i = 0; i < team.size(); i++) {
+			if (patterns.contains(team.get(i)))
+				counter++;
+		}
+		return counter;
+	}
+
+	public int findLen2Patterns(List<Integer> team, List<List<Integer>> patterns) {
+		int counter = 0;
+		for (int i = 0; i < team.size(); i++) {
+			for (int j = i; j < team.size(); j++) {
+				List<Integer> tmpSet = new ArrayList<Integer>();
+				tmpSet.add(team.get(i));
+				tmpSet.add(team.get(j));
+				if (patterns.contains(tmpSet))
+					counter++;
+			}
+		}
+		return counter;
 	}
 
 	public double test(List<MatchObject> testMatches) {

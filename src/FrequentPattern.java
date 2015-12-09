@@ -13,7 +13,7 @@ public class FrequentPattern {
 	int[][] winners;
 	private int playerNum;
 
-	public List<List<Integer>> Len1Patterns;
+	public List<Integer> Len1Patterns;
 	public List<List<Integer>> Len2Patterns;
 	public List<List<Integer>> Len3Patterns;
 	public List<List<Integer>> Len4Patterns;
@@ -23,6 +23,7 @@ public class FrequentPattern {
 		this.minSup = minsup;
 		this.playerNum = matches.get(0).getResult().getHuman_players() / 2;
 		this.winners = findWinners(matches);
+		Len1Patterns = new ArrayList<Integer>();
 	}
 
 	// Find out the winner of each match, and put them in a n*5 matrix
@@ -62,19 +63,22 @@ public class FrequentPattern {
 				initSet[heroId - 1]++;
 			}
 		}
+
 		for (int i = 0; i < initSet.length; i++) {
 			if (initSet[i] >= this.minSup) {
+				// System.out.print(initSet[i] + ", ");
 				List<Integer> item = new ArrayList<Integer>();
 				item.add(i + 1);
+				this.Len1Patterns.add(i + 1);
 				L.add(item);
 			}
 		}
+		// System.out.println();
 
-		this.Len1Patterns = L;
-		System.out.println("Len1 patterns found!");
+		// System.out.println("Len1 patterns found!");
 		patternLen++;
 
-		while (patternLen <= this.playerNum) {
+		while (patternLen <= 5) {
 			// find C(k) from L(k-1)
 			// join
 			C = findCandidate(L);
@@ -84,19 +88,19 @@ public class FrequentPattern {
 			switch (patternLen) {
 			case 2:
 				this.Len2Patterns = L;
-				System.out.println("Len2 patterns found!");
+				// System.out.println("Len2 patterns found!");
 				break;
 			case 3:
 				this.Len3Patterns = L;
-				System.out.println("Len3 patterns found!");
+				// System.out.println("Len3 patterns found!");
 				break;
 			case 4:
 				this.Len4Patterns = L;
-				System.out.println("Len4 patterns found!");
+				// System.out.println("Len4 patterns found!");
 				break;
 			case 5:
 				this.Len5Patterns = L;
-				System.out.println("Len5 patterns found!");
+				// System.out.println("Len5 patterns found!");
 				break;
 			}
 			patternLen++;
@@ -193,7 +197,9 @@ public class FrequentPattern {
 		Converter c = new Converter(matches);
 		List<MatchObject> mObjects = new ArrayList<MatchObject>();
 		mObjects = c.convert();
-		FrequentPattern fp = new FrequentPattern(mObjects, mObjects.size() / 160);
+		// FrequentPattern fp = new FrequentPattern(mObjects, (int)
+		// (mObjects.size() * 5 / 112 / 2 / 10));
+		FrequentPattern fp = new FrequentPattern(mObjects, (int) (mObjects.size() * 5 / 112 / 2 / 1.5));
 		fp.Apriori();
 
 		System.out.println();
