@@ -30,13 +30,13 @@ public class FrequentPattern {
 	//Helper function for findWinners(), find winners for one match
 	private int[] findWinSide(boolean rWin, List<Player> players){
 		int[] winner = new int[this.playerNum];
-		if(rWin == true){
 			for(Player p: players){
-				if(p.getPlayer_slot()<=4){
+				if(rWin && p.getPlayer_slot()<=4){
 					winner[p.getPlayer_slot()] = p.getHero_id();
+				}else if(!rWin && p.getPlayer_slot() > 4){
+					winner[p.getPlayer_slot()- 128] = p.getHero_id();
 				}
 			}
-		}
 		return winner;
 	}
 	
@@ -55,7 +55,7 @@ public class FrequentPattern {
 		for(int i = 0; i< initSet.length; i++){
 			if(initSet[i] >= this.minSup){
 				List<Integer>  item = new ArrayList<Integer>();
-				item.add(i);
+				item.add(i+1);
 				L.add(item);
 			}
 		}
@@ -68,7 +68,7 @@ public class FrequentPattern {
 			L = TestCandidate(C);
 			cont++;
 		}
-		return C;
+		return L;
 	}
 	//Helper function for Apriori, join step for finding the C(k) candidates from L(k-1)
 	private List<List<Integer>> findCandidate(List<List<Integer>> L){
@@ -107,14 +107,39 @@ public class FrequentPattern {
 		boolean result = true;
 		for(int i = 0; i<set.size(); i++){
 			List<Integer> tempSet = new ArrayList<Integer>(set);
-			result = result && fpItemset.contains(tempSet.remove(i));
+			tempSet.remove(i);
+			result = result && fpItemset.contains(tempSet);
 		}
 		return !result;
 	}
 	//Helper function for Apriori, testing step for test C(k) against data;
 	private List<List<Integer>> TestCandidate(List<List<Integer>> candidate_k){
 		List<List<Integer>> fp_k = new ArrayList<List<Integer>>();
-		
+		int[] map = new int[candidate_k.size()];
+		for(int i=0;i<this.winners.length;i++){
+			for(int index =0;index<candidate_k.size();index++){
+				if(testContain(this.winners[i],candidate_k.get(index))){
+					map[index]++;
+				}
+			}
+		}
+		for(int index = 0; index < map.length; index++){
+			if(map[index] >= this.minSup) fp_k.add(candidate_k.get(index));
+		}
 		return fp_k;
+	}
+	//Helper function for TestCandidate(), test whether each itemset contains a frequent parttern
+	private boolean testContain(int[] is, List<Integer> list) {
+		boolean result=true;
+		List<Integer> isCopy = new ArrayList<Integer>();
+		for(int i=0;i<is.length; i++){
+			int id = is[i];
+			isCopy.add(id);
+		}
+		for(int index=0; index<list.size();index++){
+			int id = list.get(index);
+			result = result && isCopy.contains(id);
+		}
+		return result;
 	}
 }
