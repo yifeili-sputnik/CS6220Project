@@ -1,4 +1,4 @@
-package DataObject;
+package dataobject;
 
 /*
  * "account_id": 75021757,

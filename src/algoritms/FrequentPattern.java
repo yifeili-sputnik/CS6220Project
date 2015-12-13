@@ -1,12 +1,14 @@
+package algoritms;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import DataObject.MatchObject;
-import DataObject.Player;
-import DataObject.Result;
-import Util.Constants;
-import Util.Converter;
+import dataobject.MatchObject;
+import dataobject.Player;
+import dataobject.Result;
+import util.Constants;
+//import util.Converter;
 
 public class FrequentPattern {
 	private int minSup;
@@ -191,18 +193,17 @@ public class FrequentPattern {
 		return result;
 	}
 
-	public static void main(String[] args) {
-		String matches = "data/rawdata";
-		// converter
-		Converter c = new Converter(matches);
-		List<MatchObject> mObjects = new ArrayList<MatchObject>();
-		mObjects = c.convert();
-		// FrequentPattern fp = new FrequentPattern(mObjects, (int)
-		// (mObjects.size() * 5 / 112 / 2 / 10));
-		FrequentPattern fp = new FrequentPattern(mObjects, (int) (mObjects.size() * 5 / 112 / 2 / 1.5));
-		fp.Apriori();
-
-		System.out.println();
-
-	}
+	// public static void main(String[] args) {
+	// String matches = "data/rawdata";
+	// // converter
+	// Converter c = new Converter(matches);
+	// List<MatchObject> mObjects = new ArrayList<MatchObject>();
+	// mObjects = c.convert();
+	// FrequentPattern fp = new FrequentPattern(mObjects, (int) (mObjects.size()
+	// * 5 / 112 / 3));
+	// fp.Apriori();
+	//
+	// System.out.println();
+	//
+	// }
 }

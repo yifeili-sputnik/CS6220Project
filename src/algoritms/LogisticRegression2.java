@@ -1,14 +1,15 @@
+package algoritms;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import DataObject.MatchObject;
-import DataObject.Player;
-import Util.Constants;
-import Util.Converter;
+import dataobject.MatchObject;
+import dataobject.Player;
+import util.Constants;
+//import util.Converter;
 
 public class LogisticRegression2 {
 	private static double learning_rate = 0.00001;
-	private static final int CROSSNUMBER = 10;
 	// minus the label column
 	double[] weights = new double[Constants.Cols2 - 1];
 	List<MatchObject> matches = new ArrayList<MatchObject>();
@@ -20,7 +21,7 @@ public class LogisticRegression2 {
 	public List<MatchObject> getTrainMatches(int crossNum) {
 		List<MatchObject> res = new ArrayList<MatchObject>();
 		for (int i = 0; i < matches.size(); i++) {
-			if (i % CROSSNUMBER != crossNum) {
+			if (i % Constants.CROSSNUMBER != crossNum) {
 				res.add(matches.get(i));
 			}
 		}
@@ -30,7 +31,7 @@ public class LogisticRegression2 {
 	public List<MatchObject> getTestMatches(int crossNum) {
 		List<MatchObject> res = new ArrayList<MatchObject>();
 		for (int i = 0; i < matches.size(); i++) {
-			if (i % CROSSNUMBER == crossNum) {
+			if (i % Constants.CROSSNUMBER == crossNum) {
 				res.add(matches.get(i));
 			}
 		}
@@ -40,7 +41,7 @@ public class LogisticRegression2 {
 	public void train(List<MatchObject> mObjects) {
 		// construct train matrix
 		int teamNumber = mObjects.size() * 2;
-		FrequentPattern fp = new FrequentPattern(mObjects, (int) (mObjects.size() * 5 / 112 / 2 / 3));
+		FrequentPattern fp = new FrequentPattern(mObjects, (int) (mObjects.size() * 5 / 112 / 3));
 		fp.Apriori();
 
 		int[][] trainMatrix = new int[teamNumber][Constants.Cols2];
@@ -71,27 +72,27 @@ public class LogisticRegression2 {
 			trainMatrix[counter][Constants.Cols2 - 2] = 1;
 			trainMatrix[counter + 1][Constants.Cols2 - 2] = 1;
 
-			int radiantFPs = 0;
-			int direFPs = 0;
+			// int radiantFPs = 0;
+			// int direFPs = 0;
 			// Length 1 frequent pattern
 			// System.out.println("Searching for L1 frequent patterns!" +
 			// PatternSearchCounter);
-			radiantFPs = findLen1Patterns(radiantTeam, fp.Len1Patterns);
-			direFPs = findLen1Patterns(direTeam, fp.Len1Patterns);
+			// radiantFPs = findLen1Patterns(radiantTeam, fp.Len1Patterns);
+			// direFPs = findLen1Patterns(direTeam, fp.Len1Patterns);
 			// System.out.println("Radiant L1 patterns: " + radiantFPs + "; " +
 			// "Dire L1 patterns; " + direFPs);
-			trainMatrix[counter][Constants.Cols2 - 4] = radiantFPs;
-			trainMatrix[counter + 1][Constants.Cols2 - 4] = direFPs;
+			// trainMatrix[counter][Constants.Cols2 - 4] = radiantFPs;
+			// trainMatrix[counter + 1][Constants.Cols2 - 4] = direFPs;
 
 			// Length 2 frequent pattern
 			// System.out.println("Searching for L2 frequent patterns!" +
 			// PatternSearchCounter);
-			radiantFPs = findLen2Patterns(radiantTeam, fp.Len2Patterns);
-			direFPs = findLen2Patterns(direTeam, fp.Len2Patterns);
+			// radiantFPs = findLen2Patterns(radiantTeam, fp.Len2Patterns);
+			// direFPs = findLen2Patterns(direTeam, fp.Len2Patterns);
 			// System.out.println("Radiant L2 patterns: " + radiantFPs + "; " +
 			// "Dire L2 patterns; " + direFPs);
-			trainMatrix[counter][Constants.Cols2 - 3] = radiantFPs;
-			trainMatrix[counter + 1][Constants.Cols2 - 3] = direFPs;
+			// trainMatrix[counter][Constants.Cols2 - 3] = radiantFPs;
+			// trainMatrix[counter + 1][Constants.Cols2 - 3] = direFPs;
 
 			// next match
 			counter += 2;
@@ -101,6 +102,7 @@ public class LogisticRegression2 {
 		double[] firstDerivative = new double[Constants.Cols2 - 1];
 		double prelkh = 0.0;
 		double currlkh = 0.0;
+		// double L1R = 0.0;
 		while (true) {
 			for (int i = 0; i < trainMatrix.length; i++) {
 				double xb = 0;
@@ -116,6 +118,11 @@ public class LogisticRegression2 {
 			for (int j = 0; j < Constants.Cols2 - 1; j++) {
 				weights[j] += learning_rate * firstDerivative[j];
 			}
+
+			// L1 regularization
+			// for (int j = 0; j < Constants.Cols2 - 1; j++) {
+			// L1R += weights[j];
+			// }
 			// likelihood
 			currlkh = 0.0;
 			for (int i = 0; i < trainMatrix.length; i++) {
@@ -125,6 +132,7 @@ public class LogisticRegression2 {
 				}
 				currlkh += (trainMatrix[i][Constants.Cols2 - 1] * xb - Math.log(1 + Math.exp(xb)));
 			}
+			// currlkh += 1.0 / 5 * L1R;
 			// System.out.println(currlkh);
 
 			if (Math.abs(currlkh - prelkh) / currlkh < 1e-6)
@@ -195,23 +203,24 @@ public class LogisticRegression2 {
 		return accuracy;
 	}
 
-	public static void main(String[] args) {
-		String matches = "data/rawdata";
-		// converter
-		Converter c = new Converter(matches);
-		List<MatchObject> mObjects = new ArrayList<MatchObject>();
-		mObjects = c.convert();
-		double accuracy = 0.0;
-		LogisticRegression2 l = new LogisticRegression2(mObjects);
-		for (int i = 0; i < CROSSNUMBER; i++) {
-			System.out.println("Cross " + (i + 1) + ": ");
-			List<MatchObject> trainMatches = l.getTrainMatches(i);
-			List<MatchObject> testMatches = l.getTestMatches(i);
-			l.train(trainMatches);
-			double tmpAccuracy = l.test(testMatches);
-			System.out.println("Accuracy: " + tmpAccuracy);
-			accuracy += tmpAccuracy;
-		}
-		System.out.println("Average accuracy: " + (double) accuracy / CROSSNUMBER);
-	}
+	// public static void main(String[] args) {
+	// String matches = "data/rawdata";
+	// // converter
+	// Converter c = new Converter(matches);
+	// List<MatchObject> mObjects = new ArrayList<MatchObject>();
+	// mObjects = c.convert();
+	// double accuracy = 0.0;
+	// LogisticRegression2 l = new LogisticRegression2(mObjects);
+	// for (int i = 0; i < Constants.CROSSNUMBER; i++) {
+	// System.out.println("Cross " + (i + 1) + ": ");
+	// List<MatchObject> trainMatches = l.getTrainMatches(i);
+	// List<MatchObject> testMatches = l.getTestMatches(i);
+	// l.train(trainMatches);
+	// double tmpAccuracy = l.test(testMatches);
+	// System.out.println("Accuracy: " + tmpAccuracy);
+	// accuracy += tmpAccuracy;
+	// }
+	// System.out.println("Average accuracy: " + (double) accuracy /
+	// Constants.CROSSNUMBER);
+	// }
 }

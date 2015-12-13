@@ -1,14 +1,15 @@
-import java.util.ArrayList;
+package algoritms;
+
+//import java.util.ArrayList;
 import java.util.List;
 
-import DataObject.MatchObject;
-import DataObject.Player;
-import Util.Constants;
-import Util.Converter;
+import dataobject.MatchObject;
+import dataobject.Player;
+import util.Constants;
+//import util.Converter;
 
 public class LogisticRegression1 {
 	private static double learning_rate = 0.00001;
-	private static final int CROSSNUMBER = 10;
 	// minus the label column
 	double[] weights = new double[Constants.Cols1 - 1];
 	int[][] matrix = null;
@@ -45,14 +46,14 @@ public class LogisticRegression1 {
 	public int[][] getTrainMatrix(int crossNum) {
 		int trainMatrixLen = 0;
 		for (int i = 0; i < matrix.length; i++) {
-			if (i % CROSSNUMBER != crossNum) {
+			if (i % Constants.CROSSNUMBER != crossNum) {
 				trainMatrixLen++;
 			}
 		}
 		int[][] trainMatrix = new int[trainMatrixLen][Constants.Cols1];
 		int counter = 0;
 		for (int i = 0; i < matrix.length; i++) {
-			if (i % CROSSNUMBER != crossNum) {
+			if (i % Constants.CROSSNUMBER != crossNum) {
 				for (int j = 0; j < Constants.Cols1; j++) {
 					trainMatrix[counter][j] = matrix[i][j];
 				}
@@ -65,14 +66,14 @@ public class LogisticRegression1 {
 	public int[][] getTestMatrix(int crossNum) {
 		int testMatrixLen = 0;
 		for (int i = 0; i < matrix.length; i++) {
-			if (i % CROSSNUMBER == crossNum) {
+			if (i % Constants.CROSSNUMBER == crossNum) {
 				testMatrixLen++;
 			}
 		}
 		int[][] testMatrix = new int[testMatrixLen][Constants.Cols1];
 		int counter = 0;
 		for (int i = 0; i < matrix.length; i++) {
-			if (i % CROSSNUMBER == crossNum) {
+			if (i % Constants.CROSSNUMBER == crossNum) {
 				for (int j = 0; j < Constants.Cols1; j++) {
 					testMatrix[counter][j] = matrix[i][j];
 				}
@@ -87,7 +88,7 @@ public class LogisticRegression1 {
 		double[] firstDerivative = new double[Constants.Cols1 - 1];
 		double prelkh = 0.0;
 		double currlkh = 0.0;
-		double L1R = 0.0;
+		// double L1R = 0.0;
 		while (true) {
 			for (int i = 0; i < trainMatrix.length; i++) {
 				double xb = 0;
@@ -151,23 +152,24 @@ public class LogisticRegression1 {
 		return accuracy;
 	}
 
-	public static void main(String[] args) {
-		String matches = "data/rawdata";
-		// converter
-		Converter c = new Converter(matches);
-		List<MatchObject> mObjects = new ArrayList<MatchObject>();
-		mObjects = c.convert();
-		double accuracy = 0;
-		LogisticRegression1 l = new LogisticRegression1(mObjects);
-		for (int i = 0; i < CROSSNUMBER; i++) {
-			System.out.println("Cross " + (i + 1) + ": ");
-			int[][] trainMatrix = l.getTrainMatrix(i);
-			int[][] testMatrix = l.getTestMatrix(i);
-			l.train(trainMatrix);
-			double tmpAccuracy = l.test(testMatrix);
-			System.out.println("Accuracy: " + tmpAccuracy);
-			accuracy += tmpAccuracy;
-		}
-		System.out.println("Average accuracy: " + (double) accuracy / CROSSNUMBER);
-	}
+	// public static void main(String[] args) {
+	// String matches = "data/rawdata";
+	// // converter
+	// Converter c = new Converter(matches);
+	// List<MatchObject> mObjects = new ArrayList<MatchObject>();
+	// mObjects = c.convert();
+	// double accuracy = 0;
+	// LogisticRegression1 l = new LogisticRegression1(mObjects);
+	// for (int i = 0; i < Constants.CROSSNUMBER; i++) {
+	// System.out.println("Cross " + (i + 1) + ": ");
+	// int[][] trainMatrix = l.getTrainMatrix(i);
+	// int[][] testMatrix = l.getTestMatrix(i);
+	// l.train(trainMatrix);
+	// double tmpAccuracy = l.test(testMatrix);
+	// System.out.println("Accuracy: " + tmpAccuracy);
+	// accuracy += tmpAccuracy;
+	// }
+	// System.out.println("Average accuracy: " + (double) accuracy /
+	// Constants.CROSSNUMBER);
+	// }
 }

@@ -1,4 +1,4 @@
-package Util;
+package util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,13 +6,13 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.util.List;
 
 import com.google.gson.Gson;
 
-import DataObject.MatchObject;
-import DataObject.Player;
+import dataobject.MatchObject;
+import dataobject.Player;
 
 public class Converter {
 	private String file = null;
@@ -46,7 +46,8 @@ public class Converter {
 			}
 		});
 
-		matches = Arrays.copyOfRange(matches, 0, 9999);
+		// change data size
+		// matches = Arrays.copyOfRange(matches, 0, 29999);
 
 		for (File f : matches) {
 			MatchObject mo = jsonToObject(f);

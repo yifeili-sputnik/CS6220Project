@@ -1,4 +1,4 @@
-package DataObject;
+package dataobject;
 
 public class MatchObject {
 	Result result;

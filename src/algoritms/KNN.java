@@ -1,17 +1,18 @@
+package algoritms;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import DataObject.MatchObject;
-import DataObject.Player;
-import Util.Converter;
+import dataobject.MatchObject;
+import dataobject.Player;
+import util.Constants;
+//import util.Converter;
 
 public class KNN {
 	private int NEIGHBORNUMBER;
 	List<MatchObject> matches = new ArrayList<MatchObject>();
-	private static final int CROSSNUMBER = 5;
 
 	public KNN(List<MatchObject> mObjects) {
 		this.matches = mObjects;
@@ -99,7 +100,7 @@ public class KNN {
 	public List<MatchObject> getTrainMatches(int crossNum) {
 		List<MatchObject> res = new ArrayList<MatchObject>();
 		for (int i = 0; i < matches.size(); i++) {
-			if (i % CROSSNUMBER != crossNum) {
+			if (i % Constants.CROSSNUMBER != crossNum) {
 				res.add(matches.get(i));
 			}
 		}
@@ -109,29 +110,30 @@ public class KNN {
 	public List<MatchObject> getTestMatches(int crossNum) {
 		List<MatchObject> res = new ArrayList<MatchObject>();
 		for (int i = 0; i < matches.size(); i++) {
-			if (i % CROSSNUMBER == crossNum) {
+			if (i % Constants.CROSSNUMBER == crossNum) {
 				res.add(matches.get(i));
 			}
 		}
 		return res;
 	}
 
-	public static void main(String[] args) {
-		String matches = "data/rawdata";
-		// converter
-		Converter c = new Converter(matches);
-		List<MatchObject> mObjects = new ArrayList<MatchObject>();
-		mObjects = c.convert();
-		double accuracy = 0.0;
-		KNN k = new KNN(mObjects);
-		for (int i = 0; i < CROSSNUMBER; i++) {
-			System.out.println("Cross " + (i + 1) + ": ");
-			List<MatchObject> trainMatches = k.getTrainMatches(i);
-			List<MatchObject> testMatches = k.getTestMatches(i);
-			double tmpAccuracy = k.classify(trainMatches, testMatches);
-			System.out.println("Accuracy: " + tmpAccuracy);
-			accuracy += tmpAccuracy;
-		}
-		System.out.println("Average accuracy: " + (double) accuracy / CROSSNUMBER);
-	}
+	// public static void main(String[] args) {
+	// String matches = "data/rawdata";
+	// // converter
+	// Converter c = new Converter(matches);
+	// List<MatchObject> mObjects = new ArrayList<MatchObject>();
+	// mObjects = c.convert();
+	// double accuracy = 0.0;
+	// KNN k = new KNN(mObjects);
+	// for (int i = 0; i < Constants.CROSSNUMBER; i++) {
+	// System.out.println("Cross " + (i + 1) + ": ");
+	// List<MatchObject> trainMatches = k.getTrainMatches(i);
+	// List<MatchObject> testMatches = k.getTestMatches(i);
+	// double tmpAccuracy = k.classify(trainMatches, testMatches);
+	// System.out.println("Accuracy: " + tmpAccuracy);
+	// accuracy += tmpAccuracy;
+	// }
+	// System.out.println("Average accuracy: " + (double) accuracy /
+	// Constants.CROSSNUMBER);
+	// }
 }
