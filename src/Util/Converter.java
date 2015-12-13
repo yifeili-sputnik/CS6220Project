@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -44,6 +45,9 @@ public class Converter {
 				return true;
 			}
 		});
+
+		matches = Arrays.copyOfRange(matches, 0, 9999);
+
 		for (File f : matches) {
 			MatchObject mo = jsonToObject(f);
 			// check validation of match data
