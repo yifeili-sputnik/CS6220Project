@@ -9,12 +9,13 @@ import DataObject.Player;
 import Util.Converter;
 
 public class KNN {
-	private static int NEIGHBORNUMBER = 100;
+	private int NEIGHBORNUMBER;
 	List<MatchObject> matches = new ArrayList<MatchObject>();
 	private static final int CROSSNUMBER = 5;
 
 	public KNN(List<MatchObject> mObjects) {
 		this.matches = mObjects;
+		this.NEIGHBORNUMBER = (int) Math.sqrt(mObjects.size());
 	}
 
 	public double getSimilarity(MatchObject m1, MatchObject m2) {
@@ -29,8 +30,8 @@ public class KNN {
 			}
 		}
 		// TO-DO design a better distance formula
-		// similarity = Math.pow(counter, 9);
-		// similarity = Math.pow(Math.log(counter + 1), 2);
+		// similarity = counter*counter;
+		similarity = Math.pow(Math.log(counter + 1), 2);
 		similarity = Math.exp(counter) - 1;
 		return similarity;
 	}
