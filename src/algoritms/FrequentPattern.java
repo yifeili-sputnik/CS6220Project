@@ -1,8 +1,13 @@
 package algoritms;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+
+import com.opencsv.CSVReader;
 
 import dataobject.MatchObject;
 import dataobject.Player;
@@ -13,7 +18,7 @@ import util.Constants;
 public class FrequentPattern {
 	private int minSup;
 	int[][] winners;
-	private int playerNum;
+	private int playerNum = 5;
 
 	public List<Integer> Len1Patterns;
 	public List<List<Integer>> Len2Patterns;
@@ -21,37 +26,42 @@ public class FrequentPattern {
 	public List<List<Integer>> Len4Patterns;
 	public List<List<Integer>> Len5Patterns;
 
-	public FrequentPattern(List<MatchObject> matches, int minsup) {
+	public FrequentPattern(List<String[]> outcomes, List<String[]> redchampions, List<String[]> bluechampions,
+			int minsup) {
 		this.minSup = minsup;
-		this.playerNum = matches.get(0).getResult().getHuman_players() / 2;
-		this.winners = findWinners(matches);
+		this.winners = findWinners(outcomes, redchampions, bluechampions);
 		Len1Patterns = new ArrayList<Integer>();
 	}
 
 	// Find out the winner of each match, and put them in a n*5 matrix
-	private int[][] findWinners(List<MatchObject> matches) {
-		int[][] winners = new int[matches.size()][this.playerNum];
-		for (int i = 0; i < matches.size(); i++) {
-			MatchObject m = matches.get(i);
-			Result r = m.getResult();
-			int[] winner = findWinSide(r.isRadiant_win(), r.getPlayers());
+	private int[][] findWinners(List<String[]> outcomes, List<String[]> redchampions, List<String[]> bluechampions) {
+		int[][] winners = new int[outcomes.size()][this.playerNum];
+		for (int i = 0; i < outcomes.size(); i++) {
+			int[] winner = new int[5];
+			if (Integer.valueOf(outcomes.get(i)[0]) == 1) {
+				String[] reds = redchampions.get(i);
+				for (int j = 0; j < 5; j++) {
+					winner[j] = Integer.valueOf(reds[j]);
+				}
+			} else {
+				String[] blues = bluechampions.get(i);
+				for (int j = 0; j < 5; j++) {
+					winner[j] = Integer.valueOf(blues[j]);
+				}
+			}
 			winners[i] = winner;
 		}
 		return winners;
 	}
 
-	// Helper function for findWinners(), find winners for one match
-	private int[] findWinSide(boolean rWin, List<Player> players) {
-		int[] winner = new int[this.playerNum];
-		for (Player p : players) {
-			if (rWin && p.getPlayer_slot() <= 4) {
-				winner[p.getPlayer_slot()] = p.getHero_id();
-			} else if (!rWin && p.getPlayer_slot() > 4) {
-				winner[p.getPlayer_slot() - 128] = p.getHero_id();
-			}
-		}
-		return winner;
-	}
+	/***
+	 * // Helper function for findWinners(), find winners for one match private
+	 * int[] findWinSide(boolean rWin, List<Player> players) { int[] winner =
+	 * new int[this.playerNum]; for (Player p : players) { if (rWin &&
+	 * p.getPlayer_slot() <= 4) { winner[p.getPlayer_slot()] = p.getHero_id(); }
+	 * else if (!rWin && p.getPlayer_slot() > 4) { winner[p.getPlayer_slot() -
+	 * 128] = p.getHero_id(); } } return winner; }
+	 ***/
 
 	public void Apriori() {
 		List<List<Integer>> C = new ArrayList<List<Integer>>();
@@ -62,7 +72,7 @@ public class FrequentPattern {
 		for (int i = 0; i < this.winners.length; i++) {
 			for (int j = 0; j < this.playerNum; j++) {
 				int heroId = this.winners[i][j];
-				initSet[heroId - 1]++;
+				initSet[heroId]++;
 			}
 		}
 
@@ -77,7 +87,7 @@ public class FrequentPattern {
 		}
 		// System.out.println();
 
-		// System.out.println("Len1 patterns found!");
+		System.out.println("Len1 patterns found!");
 		patternLen++;
 
 		while (patternLen <= 5) {
@@ -90,19 +100,19 @@ public class FrequentPattern {
 			switch (patternLen) {
 			case 2:
 				this.Len2Patterns = L;
-				// System.out.println("Len2 patterns found!");
+				System.out.println("Len2 patterns found!");
 				break;
 			case 3:
 				this.Len3Patterns = L;
-				// System.out.println("Len3 patterns found!");
+				System.out.println("Len3 patterns found!");
 				break;
 			case 4:
 				this.Len4Patterns = L;
-				// System.out.println("Len4 patterns found!");
+				System.out.println("Len4 patterns found!");
 				break;
 			case 5:
 				this.Len5Patterns = L;
-				// System.out.println("Len5 patterns found!");
+				System.out.println("Len5 patterns found!");
 				break;
 			}
 			patternLen++;
@@ -191,6 +201,24 @@ public class FrequentPattern {
 			result = result && isCopy.contains(id);
 		}
 		return result;
+	}
+
+	@SuppressWarnings("resource")
+	public static void main(String[] args) throws IOException {
+		CSVReader reader;
+		reader = new CSVReader(new FileReader("data/matchoutcome.csv"));
+		List<String[]> outcomes = reader.readAll();
+		reader = new CSVReader(new FileReader("data/BlueChampion.csv"));
+		List<String[]> bluechampions = reader.readAll();
+		reader = new CSVReader(new FileReader("data/RedChampion.csv"));
+		List<String[]> redchampions = reader.readAll();
+
+		FrequentPattern fp = new FrequentPattern(outcomes, bluechampions, redchampions, (int) outcomes.size() / 50);
+
+		fp.Apriori();
+
+		System.out.println();
+
 	}
 
 	// public static void main(String[] args) {

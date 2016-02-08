@@ -1,10 +1,11 @@
 package algoritms;
 
-import java.util.ArrayList;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 
-import dataobject.MatchObject;
-import dataobject.Player;
+import com.opencsv.CSVReader;
+
 import util.Constants;
 //import util.Converter;
 
@@ -12,65 +13,38 @@ public class LogisticRegression2 {
 	private static double learning_rate = 0.00001;
 	// minus the label column
 	double[] weights = new double[Constants.Cols2 - 1];
-	List<MatchObject> matches = new ArrayList<MatchObject>();
 
-	public LogisticRegression2(List<MatchObject> mObjects) {
-		this.matches = mObjects;
-	}
-
-	public List<MatchObject> getTrainMatches(int crossNum) {
-		List<MatchObject> res = new ArrayList<MatchObject>();
-		for (int i = 0; i < matches.size(); i++) {
-			if (i % Constants.CROSSNUMBER != crossNum) {
-				res.add(matches.get(i));
-			}
-		}
-		return res;
-	}
-
-	public List<MatchObject> getTestMatches(int crossNum) {
-		List<MatchObject> res = new ArrayList<MatchObject>();
-		for (int i = 0; i < matches.size(); i++) {
-			if (i % Constants.CROSSNUMBER == crossNum) {
-				res.add(matches.get(i));
-			}
-		}
-		return res;
-	}
-
-	public void train(List<MatchObject> mObjects) {
+	public void train(List<String[]> outcomes, List<String[]> redchampions, List<String[]> bluechampions) {
 		// construct train matrix
-		int teamNumber = mObjects.size() * 2;
-		FrequentPattern fp = new FrequentPattern(mObjects, (int) (mObjects.size() * 5 / 112 / 3));
-		fp.Apriori();
+		int teamNumber = outcomes.size() * 2;
+		// FrequentPattern fp = new FrequentPattern(mObjects, (int)
+		// (mObjects.size() * 5 / 112 / 3));
+		// fp.Apriori();
 
 		int[][] trainMatrix = new int[teamNumber][Constants.Cols2];
 		int counter = 0;
 
-		for (MatchObject m : mObjects) {
-			List<Integer> radiantTeam = new ArrayList<Integer>();
-			List<Integer> direTeam = new ArrayList<Integer>();
-			// hero id
-			for (Player p : m.getResult().getPlayers()) {
-				int heroID = p.getHero_id();
-				int playerSlot = p.getPlayer_slot();
-				if (playerSlot <= 4) {
-					trainMatrix[counter][heroID - 1] = 1;
-					radiantTeam.add(heroID);
-				} else {
-					trainMatrix[counter + 1][heroID - 1] = 1;
-					direTeam.add(heroID);
-				}
+		while (counter < outcomes.size()) {
+			String[] blues = bluechampions.get(counter);
+			String[] reds = redchampions.get(counter);
+			String[] outcome = outcomes.get(counter);
+			for (String s : blues) {
+				int index = Integer.valueOf(s);
+				trainMatrix[counter * 2][index] = 1;
+			}
+			for (String s : reds) {
+				int index = Integer.valueOf(s);
+				trainMatrix[counter * 2 + 1][index] = 1;
 			}
 			// win/loss
-			if (m.getResult().isRadiant_win()) {
-				trainMatrix[counter][Constants.Cols2 - 1] = 1;
+			if (Integer.valueOf(outcome[0]) == 1) {
+				trainMatrix[counter * 2 + 1][Constants.Cols2 - 1] = 1;
 			} else {
-				trainMatrix[counter + 1][Constants.Cols2 - 1] = 1;
+				trainMatrix[counter * 2][Constants.Cols2 - 1] = 1;
 			}
 			// constants
-			trainMatrix[counter][Constants.Cols2 - 2] = 1;
-			trainMatrix[counter + 1][Constants.Cols2 - 2] = 1;
+			trainMatrix[counter * 2][Constants.Cols2 - 2] = 1;
+			trainMatrix[counter * 2 + 1][Constants.Cols2 - 2] = 1;
 
 			// int radiantFPs = 0;
 			// int direFPs = 0;
@@ -95,7 +69,7 @@ public class LogisticRegression2 {
 			// trainMatrix[counter + 1][Constants.Cols2 - 3] = direFPs;
 
 			// next match
-			counter += 2;
+			counter++;
 		}
 
 		// first derivative
@@ -143,66 +117,80 @@ public class LogisticRegression2 {
 		System.out.println("MLE: " + currlkh);
 	}
 
-	public int findLen1Patterns(List<Integer> team, List<Integer> patterns) {
-		int counter = 0;
-		for (int i = 0; i < team.size(); i++) {
-			if (patterns.contains(team.get(i)))
-				counter++;
-		}
-		return counter;
-	}
+	/***
+	 * public int findLen1Patterns(List<Integer> team, List<Integer> patterns) {
+	 * int counter = 0; for (int i = 0; i < team.size(); i++) { if
+	 * (patterns.contains(team.get(i))) counter++; } return counter; }
+	 * 
+	 * public int findLen2Patterns(List<Integer> team, List<List<Integer>>
+	 * patterns) { int counter = 0; for (int i = 0; i < team.size(); i++) { for
+	 * (int j = i; j < team.size(); j++) { List<Integer> tmpSet = new ArrayList
+	 * <Integer>(); tmpSet.add(team.get(i)); tmpSet.add(team.get(j)); if
+	 * (patterns.contains(tmpSet)) counter++; } } return counter; }
+	 ***/
 
-	public int findLen2Patterns(List<Integer> team, List<List<Integer>> patterns) {
-		int counter = 0;
-		for (int i = 0; i < team.size(); i++) {
-			for (int j = i; j < team.size(); j++) {
-				List<Integer> tmpSet = new ArrayList<Integer>();
-				tmpSet.add(team.get(i));
-				tmpSet.add(team.get(j));
-				if (patterns.contains(tmpSet))
-					counter++;
-			}
-		}
-		return counter;
-	}
-
-	public double test(List<MatchObject> testMatches) {
+	public double test(List<String[]> outcomes, List<String[]> redchampions, List<String[]> bluechampions) {
 		double accuracy = 0.0;
 		int counter = 0;
-		for (MatchObject m : testMatches) {
-			int[] radientTeam = new int[Constants.Cols2 - 1];
-			int[] direTeam = new int[Constants.Cols2 - 1];
-			radientTeam[Constants.Cols2 - 2] = 1;
-			direTeam[Constants.Cols2 - 2] = 1;
-			boolean output;
-			for (Player p : m.getResult().getPlayers()) {
-				int heroID = p.getHero_id();
-				int playerSlot = p.getPlayer_slot();
-				if (playerSlot <= 4) {
-					radientTeam[heroID - 1] = 1;
-				} else {
-					direTeam[heroID - 1] = 1;
-				}
+		int match = 0;
+		while (match < outcomes.size()) {
+			int[] red = new int[Constants.Cols2 - 1];
+			int[] blue = new int[Constants.Cols2 - 1];
+			red[Constants.Cols2 - 2] = 1;
+			blue[Constants.Cols2 - 2] = 1;
+			int output;
+
+			String[] blues = bluechampions.get(match);
+			String[] reds = redchampions.get(match);
+			String[] outcome = outcomes.get(match);
+			for (String s : blues) {
+				int index = Integer.valueOf(s);
+				blue[index] = 1;
 			}
-			double radiantXB = 0.0;
-			double direXB = 0.0;
+			for (String s : reds) {
+				int index = Integer.valueOf(s);
+				red[index] = 1;
+			}
+
+			double redXB = 0.0;
+			double blueXB = 0.0;
 			for (int j = 0; j < Constants.Cols2 - 1; j++) {
-				radiantXB += radientTeam[j] * weights[j];
-				direXB += direTeam[j] * weights[j];
+				redXB += red[j] * weights[j];
+				blueXB += blue[j] * weights[j];
 			}
-			double radiantWin = Math.exp(radiantXB - direXB) / (1 + Math.exp(radiantXB - direXB));
-			if (radiantWin > 0.5) {
-				output = true;
+			double redWin = Math.exp(redXB - blueXB) / (1 + Math.exp(redXB - blueXB));
+			if (redWin > 0.5) {
+				output = 1;
 			} else {
-				output = false;
+				output = 0;
 			}
-			if (output == m.getResult().isRadiant_win())
+			if (output == Integer.valueOf(outcome[0]))
 				counter++;
+			match++;
 		}
-		accuracy = (double) counter / testMatches.size();
+		accuracy = (double) counter / outcomes.size();
 		return accuracy;
 	}
 
+	@SuppressWarnings("resource")
+	public static void main(String[] args) throws IOException {
+		CSVReader reader;
+		reader = new CSVReader(new FileReader("data/matchoutcome.csv"));
+		List<String[]> outcomes = reader.readAll();
+		reader = new CSVReader(new FileReader("data/BlueChampion.csv"));
+		List<String[]> bluechampions = reader.readAll();
+		reader = new CSVReader(new FileReader("data/RedChampion.csv"));
+		List<String[]> redchampions = reader.readAll();
+		reader = new CSVReader(new FileReader("data/testMatchOutcome.csv"));
+		List<String[]> testoutcomes = reader.readAll();
+		reader = new CSVReader(new FileReader("data/testBlueChampion.csv"));
+		List<String[]> testbluechampions = reader.readAll();
+		reader = new CSVReader(new FileReader("data/testRedChampion.csv"));
+		List<String[]> testredchampions = reader.readAll();
+		LogisticRegression2 l = new LogisticRegression2();
+		l.train(outcomes, redchampions, bluechampions);
+		System.out.println(l.test(outcomes, redchampions, bluechampions));
+	}
 	// public static void main(String[] args) {
 	// String matches = "data/rawdata";
 	// // converter

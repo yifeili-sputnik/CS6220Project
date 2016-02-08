@@ -9,14 +9,14 @@ public class Constants {
 	// CROSS NUMBER
 	public static final int CROSSNUMBER = 10;
 
-	// 112*2+1+1
-	// 112 heroes + 112 heros + constant + label
-	public static final int Cols1 = 226;
+	// 126*2+1+1
+	// 126 heroes + 126 heros + constant + label
+	public static final int Cols1 = 254;
 
-	// 112+1+2+1
-	// 112 heroes + constant + frequent patterns + label
-	public static final int Cols2 = 116;
+	// 126+1+1
+	// 126 heroes + constant + frequent patterns + label
+	public static final int Cols2 = 128;
 
 	// constant hero number
-	public static final int HERONUM = 112;
+	public static final int HERONUM = 126;
 }
